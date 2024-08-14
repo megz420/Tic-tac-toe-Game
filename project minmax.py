@@ -97,6 +97,8 @@ def check_win (player, board = board):
 # MINMAX function for AI part
 # Depth limit for Minimax
 DEPTH_LIMIT = 2
+DEPTH_LIMIT_1 = 2
+DEPTH_LIMIT_2 = 2
 
 def min_max(board, depth , alpha, beta, is_maximizer):
     if check_win(2, board):
@@ -249,8 +251,11 @@ while not mode_selected:
 # Difficulty selection loop
 if mode in (2, 3):
     difficulty_selected = False
+    title_text = "Computer Level"
+    title_surface = font.render(title_text, True, WHITE)
+    screen.fill(BLACK)
+    screen.blit(title_surface, (WIDTH // 3.2, 20))
     while not difficulty_selected:
-        screen.fill(BLACK)
         buttonEasy.draw(screen)
         buttonMedium.draw(screen)
         buttonHard.draw(screen)
@@ -270,6 +275,34 @@ if mode in (2, 3):
                 difficulty_selected = True
         
         pg.display.flip()
+
+if mode == 3:
+    difficulty_selected = False
+    title_text = "Computer 2 Level"
+    title_surface = font.render(title_text, True, WHITE)
+    screen.fill(BLACK)
+    screen.blit(title_surface, (WIDTH // 3.5, 20))
+    while not difficulty_selected:
+        buttonEasy.draw(screen)
+        buttonMedium.draw(screen)
+        buttonHard.draw(screen)
+        
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+            if buttonEasy.is_clicked(event):
+                DEPTH_LIMIT_2 = 1
+                difficulty_selected = True
+            if buttonMedium.is_clicked(event):
+                DEPTH_LIMIT_2 = 2
+                difficulty_selected = True
+            if buttonHard.is_clicked(event):
+                DEPTH_LIMIT_2 = 3
+                difficulty_selected = True
+        DEPTH_LIMIT_1 = DEPTH_LIMIT
+        pg.display.flip()
+
 
 
 # infinite loop (main of the game)
@@ -296,6 +329,11 @@ if mode_selected == 1:
                 
                 if (mode == 2 and player ==2) or mode == 3:
                     if not game_over:
+                        if mode == 3:
+                            if player == 1:
+                                DEPTH_LIMIT = DEPTH_LIMIT_1
+                            else:
+                                DEPTH_LIMIT = DEPTH_LIMIT_2
                         if best_move(player):
                             print ("ai is here")
                             if check_win(player) or is_full_board():
