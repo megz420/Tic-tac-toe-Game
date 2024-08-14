@@ -21,8 +21,8 @@ BOARD_ROWS = 7  # 3
 BOARD_COLS = 7  # 3
 SQUARE_SIZE = HEIGHT // BOARD_COLS
 CIRCLE_RADIUS = SQUARE_SIZE // 3
-CIRCLE_WIDTH = 15
-CROSS_WIDTH = 25
+CIRCLE_WIDTH = 10
+CROSS_WIDTH = 15
 
 # AI portion definition
 MAXIMIZER = True
@@ -46,11 +46,11 @@ def draw_lines (color = WHITE):
 def draw_figures(color = WHITE):
     for row in range (BOARD_ROWS):
         for col in range (BOARD_COLS):
-            if board[row][col] == 1:
+            if board[row][col] == 2:
                 pg.draw.circle(screen, color, (int(col * SQUARE_SIZE + SQUARE_SIZE // 2),int(row * SQUARE_SIZE + SQUARE_SIZE // 2)), CIRCLE_RADIUS, CIRCLE_WIDTH )
-            elif board[row][col] == 2:
-                pg.draw.line(screen, color, (col * SQUARE_SIZE + SQUARE_SIZE // 4, row * SQUARE_SIZE + SQUARE_SIZE //4), (col * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4 , row * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4), LINE_WIDTH)
-                pg.draw.line(screen, color, (col * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4, row * SQUARE_SIZE + SQUARE_SIZE //4), (col * SQUARE_SIZE + SQUARE_SIZE // 4 , row * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4), LINE_WIDTH)
+            elif board[row][col] == 1:
+                pg.draw.line(screen, color, (col * SQUARE_SIZE + SQUARE_SIZE // 4, row * SQUARE_SIZE + SQUARE_SIZE //4), (col * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4 , row * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4), CROSS_WIDTH)
+                pg.draw.line(screen, color, (col * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4, row * SQUARE_SIZE + SQUARE_SIZE //4), (col * SQUARE_SIZE + SQUARE_SIZE // 4 , row * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4), CROSS_WIDTH)
                 
 # marking the square
 def mark_square (row, col, player):
@@ -206,59 +206,70 @@ class Button:
         return False
 
 # Create buttons
-button1 = Button(130, 80, 400, 80, "Player vs. Player", (51,101,0), HOVER_COLOR)
-button2 = Button(130, 180, 400, 80, "Player vs. Computer", (153,153,0), HOVER_COLOR)
-button3 = Button(130, 280, 400, 80, "Computer vs. Computer", (153,0,0), HOVER_COLOR)
-button4 = Button(20, 500, 200, 50, "Easy", (220,43,5), HOVER_COLOR)
-button5 = Button(200, 500, 200, 50, "medium", (33,44,56), HOVER_COLOR)
-button6 = Button(400, 500, 200, 50, "Hard", (87,200,38), HOVER_COLOR)
-button7 = Button(100, 640, 300, 50, "score= "+ str(DEPTH_LIMIT) , BLACK, HOVER_COLOR)
-button8 = Button(180, 640, 300, 50, "score= "+ str(DEPTH_LIMIT) , BLACK, HOVER_COLOR)
+buttonPvP = Button(130, 80, 400, 80, "Player vs. Player", (51,101,0), HOVER_COLOR)
+buttonPvC = Button(130, 180, 400, 80, "Player vs. Computer", (153,153,0), HOVER_COLOR)
+buttonCvC = Button(130, 280, 400, 80, "Computer vs. Computer", (153,0,0), HOVER_COLOR)
+buttonEasy = Button(130, 80, 400, 80, "Easy", (220,43,5), HOVER_COLOR)
+buttonMedium = Button(130, 180, 400, 80, "medium", (33,44,56), HOVER_COLOR)
+buttonHard = Button(130, 280, 400, 80, "Hard", (87,200,38), HOVER_COLOR)
+buttonRestart = Button(350, 640, 300, 50, "Restart" , BLACK, HOVER_COLOR)
+buttonStr = Button(10, 640, 200, 50, "score= "+ str(DEPTH_LIMIT) , BLACK, HOVER_COLOR)
 
-mode_selected = 0
+mode_selected = False
 mode = 0
-# Main loop
-running = True
-while running:
+
+# Main loop for mode selection
+while not mode_selected:
     screen.fill(BLACK)
 
     for event in pg.event.get():
-        if button4.is_clicked(event):
-            print("Easy")
-            DEPTH_LIMIT = 1
-        if button5.is_clicked(event):
-            print("Medium")
-            DEPTH_LIMIT = 2
-        if button6.is_clicked(event):
-            print("Hard")
-            DEPTH_LIMIT = 3
         if event.type == pg.QUIT:
-            running = False
-        if button1.is_clicked(event):
+            pg.quit()
+            sys.exit()
+        if buttonPvP.is_clicked(event):
             print("Player vs. Player mode selected!")
-            mode_selected = 1
             mode = 1
-            running = False ; break
-        if button2.is_clicked(event):
+            mode_selected = True
+        if buttonPvC.is_clicked(event):
             print("Player vs. Computer mode selected!")
-            mode_selected = 1
             mode = 2
-            running = False ; break
-        if button3.is_clicked(event):
+            mode_selected = True
+        if buttonCvC.is_clicked(event):
             print("Computer vs. Computer mode selected!")
-            mode_selected = 1 
             mode = 3
-            running = False ; break
+            mode_selected = True
 
     # Draw the buttons
-    button1.draw(screen)
-    button2.draw(screen)
-    button3.draw(screen)
-    button4.draw(screen)
-    button5.draw(screen)
-    button6.draw(screen)
+    buttonPvP.draw(screen)
+    buttonPvC.draw(screen)
+    buttonCvC.draw(screen)
 
     pg.display.flip()
+
+# Difficulty selection loop
+if mode in (2, 3):
+    difficulty_selected = False
+    while not difficulty_selected:
+        screen.fill(BLACK)
+        buttonEasy.draw(screen)
+        buttonMedium.draw(screen)
+        buttonHard.draw(screen)
+        
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                pg.quit()
+                sys.exit()
+            if buttonEasy.is_clicked(event):
+                DEPTH_LIMIT = 1
+                difficulty_selected = True
+            if buttonMedium.is_clicked(event):
+                DEPTH_LIMIT = 2
+                difficulty_selected = True
+            if buttonHard.is_clicked(event):
+                DEPTH_LIMIT = 3
+                difficulty_selected = True
+        
+        pg.display.flip()
 
 
 # infinite loop (main of the game)
@@ -266,12 +277,19 @@ if mode_selected == 1:
     while True:
         screen.fill(BLACK)
         draw_lines()
-        button7.draw(screen)
-        button8.draw(screen)
+        buttonRestart.draw(screen)
+        buttonStr.draw(screen)
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 sys.exit()
+            
+            if buttonRestart.is_clicked(event):
+                    restart_game()
+                    game_over = False
+                    player = 1
+                    pg.display.flip()
+
             while True:
                 if game_over == True:
                     break
@@ -284,7 +302,14 @@ if mode_selected == 1:
                                 game_over = True
                         player = player % 2 + 1
                         print (player)
-                if mode == 1  or (mode == 2 and player ==1):
+
+                if buttonRestart.is_clicked(event):
+                    restart_game()
+                    game_over = False
+                    player = 1
+                    pg.display.flip()
+
+                elif mode == 1  or (mode == 2 and player ==1):
                     if event.type == pg.MOUSEBUTTONDOWN and not game_over:
                         mouseX = event.pos[0] // SQUARE_SIZE
                         mouseY = event.pos[1] // SQUARE_SIZE
@@ -294,11 +319,6 @@ if mode_selected == 1:
                                 game_over = True
                             player = player % 2 + 1
                             print(player)
-                elif event.type == pg.KEYDOWN:
-                    if event.key == pg.K_r:
-                        restart_game()
-                        game_over = False
-                        player = 1
 
                 if not game_over:
                     draw_figures()
