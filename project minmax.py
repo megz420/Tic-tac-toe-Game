@@ -4,7 +4,7 @@ import pygame as pg
 
 pg.init()
 
-# colors 
+# colors
 WHITE = (255 ,255 ,255)
 GRAY = (180 ,180 ,180)
 RED = (255 ,0 ,0)
@@ -28,6 +28,9 @@ CROSS_WIDTH = 15
 MAXIMIZER = True
 MINIMIZER = False
 
+# Empty spaces tracker
+EMPTY = 49
+
 # screen
 screen = pg.display.set_mode ((WIDTH,HEIGHT+70))
 pg.display.set_caption('Tic Tac Toe Game')
@@ -36,7 +39,7 @@ pg.display.set_caption('Tic Tac Toe Game')
 # defining board array
 board = np.zeros((BOARD_ROWS,BOARD_COLS))
 
-# drawing lines 
+# drawing lines
 def draw_lines (color = WHITE):
     for i in range (1, BOARD_ROWS+1):
         pg.draw.line(screen, color, (0, SQUARE_SIZE * i), (WIDTH, SQUARE_SIZE * i), LINE_WIDTH)
@@ -51,10 +54,12 @@ def draw_figures(color = WHITE):
             elif board[row][col] == 1:
                 pg.draw.line(screen, color, (col * SQUARE_SIZE + SQUARE_SIZE // 4, row * SQUARE_SIZE + SQUARE_SIZE //4), (col * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4 , row * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4), CROSS_WIDTH)
                 pg.draw.line(screen, color, (col * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4, row * SQUARE_SIZE + SQUARE_SIZE //4), (col * SQUARE_SIZE + SQUARE_SIZE // 4 , row * SQUARE_SIZE + (3 * SQUARE_SIZE) // 4), CROSS_WIDTH)
-                
+
 # marking the square
 def mark_square (row, col, player):
     board[row][col] = player
+    global EMPTY
+    EMPTY -= 1
 
 # checking if available square
 def is_available (row, col):
@@ -62,11 +67,7 @@ def is_available (row, col):
 
 # checking if board is full 
 def is_full_board (board = board):
-    for row in range (BOARD_ROWS):
-        for col in range (BOARD_COLS):
-            if board[row][col] == 0:
-                return False
-    return True
+    return EMPTY == 0
 
 # checking if win       # modified
 def check_win (player, board = board):
@@ -82,7 +83,7 @@ def check_win (player, board = board):
         for j in range (i,BOARD_ROWS-3):
             if ((board[(j-i)][j] == player and board[(j-i)+1][j+1] == player and board[(j-i)+2][j+2] == player and board[(j-i)+3][j+3] == player) or
                 (board[j][(j-i)] == player and board[j+1][(j-i)+1] == player and board[j+2][(j-i)+2] == player and board[j+3][(j-i)+3] == player)):
-                return True  
+                return True
     shift = 0
     for i in range(3,BOARD_ROWS):
         m = i 
@@ -92,7 +93,7 @@ def check_win (player, board = board):
                 return True
             m = m + 1
         shift += 2
-    return False 
+    return False
 
 # MINMAX function for AI part
 # Depth limit for Minimax
@@ -106,7 +107,7 @@ def min_max(board, depth , alpha, beta, is_maximizer):
     elif check_win(1, board):
         return -100 + depth
     elif is_full_board(board) or depth >= DEPTH_LIMIT:
-        return 0  
+        return 0
 
     if is_maximizer == MAXIMIZER:
         best_score = -1000
@@ -166,6 +167,8 @@ def best_move(player):
 
 # function for restarting the game 
 def restart_game():
+    global EMPTY
+    EMPTY = 49
     screen.fill(BLACK)
     draw_lines()
     for row in range (BOARD_ROWS):
@@ -259,7 +262,7 @@ if mode in (2, 3):
         buttonEasy.draw(screen)
         buttonMedium.draw(screen)
         buttonHard.draw(screen)
-        
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
@@ -273,7 +276,7 @@ if mode in (2, 3):
             if buttonHard.is_clicked(event):
                 DEPTH_LIMIT = 3
                 difficulty_selected = True
-        
+
         pg.display.flip()
 
 if mode == 3:
@@ -286,7 +289,7 @@ if mode == 3:
         buttonEasy.draw(screen)
         buttonMedium.draw(screen)
         buttonHard.draw(screen)
-        
+
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
@@ -316,17 +319,17 @@ if mode_selected == 1:
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 sys.exit()
-            
+
             if buttonRestart.is_clicked(event):
-                    restart_game()
-                    game_over = False
-                    player = 1
-                    pg.display.flip()
+                restart_game()
+                game_over = False
+                player = 1
+                pg.display.flip()
 
             while True:
                 if game_over == True:
                     break
-                
+
                 if (mode == 2 and player ==2) or mode == 3:
                     if not game_over:
                         if mode == 3:
@@ -370,7 +373,7 @@ if mode_selected == 1:
                     else:
                         draw_figures(GRAY)
                         draw_lines(GRAY)
-                
+
                 pg.display.update()
                 if mode ==1 or mode ==2:
                     break
