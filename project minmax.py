@@ -96,6 +96,72 @@ def check_win (player, board = board):
         shift += 2
     return False
 
+def count_close_win (player, board = board):
+    count = 0
+    for col in range (BOARD_COLS):
+        for row in range (0 , BOARD_ROWS-3):
+            rowmax = row + 4
+            points = 0
+            valid = True
+            for counting_row in range(row, rowmax):
+                if board[counting_row][col] == player:
+                    points+=1
+                elif board[counting_row][col] == 0:
+                    pass
+                else:
+                    valid = False
+                    break
+            if points == 3 and valid:
+                count += 1
+    for row in range (BOARD_ROWS):
+        for col in range (0 , BOARD_COLS-3):
+            colmax = col + 4
+            points = 0
+            valid = True
+            for counting_col in range(col, colmax):
+                if board[row][counting_col] == player:
+                    points+=1
+                elif board[row][counting_col] == 0:
+                    pass
+                else:
+                    valid = False
+                    break
+            if points == 3 and valid:
+                count += 1
+    for i in range(3, -1, -1):
+        for j in range (i,BOARD_ROWS-3):
+            count += (board[(j-i)][j] == player and board[(j-i)+1][j+1] == player and board[(j-i)+2][j+2] == player and board[(j-i)+3][j+3] == 0)
+            count += (board[(j-i)][j] == 0 and board[(j-i)+1][j+1] == player and board[(j-i)+2][j+2] == player and board[(j-i)+3][j+3] == player)
+            count += (board[(j-i)][j] == player and board[(j-i)+1][j+1] == 0 and board[(j-i)+2][j+2] == player and board[(j-i)+3][j+3] == player)
+            count += (board[(j-i)][j] == player and board[(j-i)+1][j+1] == player and board[(j-i)+2][j+2] == 0 and board[(j-i)+3][j+3] == player)
+            count += (board[j][(j-i)] == player and board[j+1][(j-i)+1] == 0 and board[j+2][(j-i)+2] == player and board[j+3][(j-i)+3] == player)
+            count += (board[j][(j-i)] == player and board[j+1][(j-i)+1] == player and board[j+2][(j-i)+2] == 0 and board[j+3][(j-i)+3] == player)
+            count += (board[j][(j-i)] == player and board[j+1][(j-i)+1] == player and board[j+2][(j-i)+2] == player and board[j+3][(j-i)+3] == 0)
+            count += (board[j][(j-i)] == 0 and board[j+1][(j-i)+1] == player and board[j+2][(j-i)+2] == player and board[j+3][(j-i)+3] == player)
+    shift = 0
+    for i in range(3,BOARD_ROWS):
+        m = i 
+        for j in range (i,BOARD_ROWS-5,-1):
+            count += (board[(i-j)][j] == player and board[(i-j)+1][j-1] == 0 and board[(i-j)+2][j-2] == player and board[(i-j)+3][j-3] == player)
+            count += (board[(i-j)][j] == player and board[(i-j)+1][j-1] == player and board[(i-j)+2][j-2] == 0 and board[(i-j)+3][j-3] == player)
+            count += (board[(i-j)][j] == player and board[(i-j)+1][j-1] == player and board[(i-j)+2][j-2] == player and board[(i-j)+3][j-3] == 0)
+            count += (board[(i-j)][j] == 0 and board[(i-j)+1][j-1] == player and board[(i-j)+2][j-2] == player and board[(i-j)+3][j-3] == player)
+            count += (board[(i+j-shift)][(m-shift)] == player and board[(i+j-shift)-1][(m-shift)+1] == 0 and board[(i+j-shift)-2][(m-shift)+2] == player and board[(i+j-shift)-3][(m-shift)+3] == player)
+            count += (board[(i+j-shift)][(m-shift)] == player and board[(i+j-shift)-1][(m-shift)+1] == player and board[(i+j-shift)-2][(m-shift)+2] == 0 and board[(i+j-shift)-3][(m-shift)+3] == player)
+            count += (board[(i+j-shift)][(m-shift)] == player and board[(i+j-shift)-1][(m-shift)+1] == player and board[(i+j-shift)-2][(m-shift)+2] == player and board[(i+j-shift)-3][(m-shift)+3] == 0)
+            count += (board[(i+j-shift)][(m-shift)] == 0 and board[(i+j-shift)-1][(m-shift)+1] == player and board[(i+j-shift)-2][(m-shift)+2] == player and board[(i+j-shift)-3][(m-shift)+3] == player)
+            m = m + 1
+        shift += 2
+    return count
+
+def center_score(player, board):
+    score = 0
+    for row in range (BOARD_ROWS):
+        for col in range (BOARD_COLS):
+            if board[row][col] == player:
+                score += 4 - max(abs(row - 4) , abs(col - 4)) + 1
+    return score
+
 # MINMAX function for AI part
 # Depth limit for Minimax
 DEPTH_LIMIT = 2
@@ -107,8 +173,11 @@ def min_max(board, depth , alpha, beta, is_maximizer):
         return 100- depth 
     elif check_win(1, board):
         return -100 + depth
-    elif is_full_board(board) or depth >= DEPTH_LIMIT:
+    elif is_full_board(board):
         return 0
+    elif depth >= DEPTH_LIMIT:
+        close_wins_total = count_close_win(2, board) - count_close_win(1, board)
+        return close_wins_total*10 + center_score(2, board) % 10
 
     if is_maximizer == MAXIMIZER:
         best_score = -1000
