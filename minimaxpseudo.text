@@ -1,25 +1,22 @@
-def minimax(game)
-    return score(game) if game.over?
-    scores = [] # an array of scores
-    moves = []  # an array of moves
+function minimax(game):
+    if game is over:
+        return score(game)
 
-    # Populate the scores array, recursing as needed
-    game.get_available_moves.each do |move|
+    scores = []  # Array to store scores
+    moves = []   # Array to store moves
+
+    for each move in game.get_available_moves():
         possible_game = game.get_new_state(move)
-        scores.push minimax(possible_game)
-        moves.push move
-    end
+        scores.append(minimax(possible_game))
+        moves.append(move)
 
-    # Do the min or the max calculation
-    if game.active_turn == @player
-        # This is the max calculation
-        max_score_index = scores.each_with_index.max[1]
-        @choice = moves[max_score_index]
+    if game.active_turn == player:
+        # Maximizing player's turn
+        max_score_index = index of the maximum value in scores
+        best_move = moves[max_score_index]
         return scores[max_score_index]
-    else
-        # This is the min calculation
-        min_score_index = scores.each_with_index.min[1]
-        @choice = moves[min_score_index]
+    else:
+        # Minimizing player's turn
+        min_score_index = index of the minimum value in scores
+        best_move = moves[min_score_index]
         return scores[min_score_index]
-    end
-end
