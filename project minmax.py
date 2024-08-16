@@ -1,6 +1,7 @@
 import sys
 import numpy as np
 import pygame as pg
+import random
 
 pg.init()
 
@@ -142,9 +143,22 @@ def min_max(board, depth , alpha, beta, is_maximizer):
 def best_move(player):
     best_score = -1000
     move = (-1, -1)
+    if EMPTY == 49:
+        mark_square(random.randint(2, 4), random.randint(2,4), player)
+        return True
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
-            if board[row][col] == 0:
+            useful_move = False
+            for row2 in range(row-1, row+2):
+                for col2 in range(col-1, col+2):
+                    if row2 < 0 or col2 < 0 or row2 >= BOARD_ROWS or col2 >= BOARD_COLS:
+                        continue
+                    if board[row2][col2] != 0:
+                        useful_move = True
+                        break
+                if useful_move:
+                    break
+            if board[row][col] == 0 and useful_move:
                 board[row][col] = 2
                 score = min_max(board, 0, -float("inf"), float("inf"), MINIMIZER)
                 board[row][col] = 0
@@ -268,13 +282,13 @@ if mode in (2, 3):
                 pg.quit()
                 sys.exit()
             if buttonEasy.is_clicked(event):
-                DEPTH_LIMIT = 1
-                difficulty_selected = True
-            if buttonMedium.is_clicked(event):
                 DEPTH_LIMIT = 2
                 difficulty_selected = True
-            if buttonHard.is_clicked(event):
+            if buttonMedium.is_clicked(event):
                 DEPTH_LIMIT = 3
+                difficulty_selected = True
+            if buttonHard.is_clicked(event):
+                DEPTH_LIMIT = 4
                 difficulty_selected = True
 
         pg.display.flip()
