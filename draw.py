@@ -1,5 +1,5 @@
 import pygame as pg
-
+from checkwin import *
 
 
 white = (255 ,255 ,255)
@@ -43,3 +43,18 @@ def draw_figures(screen, board, color = white):
 def mark_square (board, row, col, player):
     board[row][col] = player
     # EMPTY -= 1
+
+def draw_status (screen, current_player, game_over, winner, color=white):
+    pg.draw.rect(screen, black, (0, height+5, width//2, 50))
+    font = pg.font.SysFont(None, 48)
+
+    # Create text for current player
+    if winner != 0:
+        player_text = f"Player {winner} wins!"
+    elif game_over:
+        player_text = "Game Over"
+    else:
+        player_text = f"Player {current_player}'s turn"
+    player_surface = font.render(player_text, True, color)
+    screen.blit(player_surface, (10, height + 20))
+

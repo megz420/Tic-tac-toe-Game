@@ -85,7 +85,7 @@ buttonEasy = Button(130, 180, 400, 80, "Easy", (220,43,5), HOVER_COLOR)
 buttonMedium = Button(130, 280, 400, 80, "medium", (33,44,56), HOVER_COLOR)
 buttonHard = Button(130, 380, 400, 80, "Hard", (87,200,38), HOVER_COLOR)
 buttonRestart = Button(350, 640, 300, 50, "Restart" , BLACK, HOVER_COLOR)
-buttonStr = Button(10, 640, 200, 50, "score= "+ str(depth_limit) , BLACK, HOVER_COLOR)
+#buttonStr = Button(10, 640, 200, 50, "score= "+ str(depth_limit) , BLACK, HOVER_COLOR)
 
 mode_selected = False
 mode = 0
@@ -181,7 +181,7 @@ if mode_selected == 1:
         screen.fill(BLACK)
         draw_lines(screen)
         buttonRestart.draw(screen)
-        buttonStr.draw(screen)
+        #buttonStr.draw(screen)
 
         for event in pg.event.get():
             if event.type == pg.QUIT:
@@ -196,7 +196,6 @@ if mode_selected == 1:
             while True:
                 if game_over == True:
                     break
-
                 if (mode == 2 and player ==2) or mode == 3:
                     if not game_over:
                         if mode == 3:
@@ -230,16 +229,21 @@ if mode_selected == 1:
 
                 if not game_over:
                     draw_figures(screen, board)
+                    draw_status(screen, player, game_over, 0, white)
+
                 else:
                     if check_win(1, board):
                         draw_figures(screen,board, GREEN)
                         draw_lines(screen, GREEN)
+                        draw_status(screen, player, game_over, 1, GREEN)
                     elif check_win(2, board):
                         draw_figures(screen, board, RED)
                         draw_lines(screen, RED)
+                        draw_status(screen, player, game_over, 2, RED)
                     else:
                         draw_figures(screen, board, GRAY)
                         draw_lines(screen, GRAY)
+                        draw_status(screen, player, game_over, 0, GRAY)
 
                 pg.display.update()
                 if mode ==1 or mode ==2:
